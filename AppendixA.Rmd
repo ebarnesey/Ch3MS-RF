@@ -581,6 +581,9 @@ Unk_table_mod.n <- Unk_table_o %>%
   left_join(wide_mz_i.a) %>% 
   left_join(wide_losses.a) 
 
+boxplot(ES_info_all.train$Retention_Index, Unk_table_mod.n$Retention_Index, names = c("Training Set", "Prediction Set"))
+# clear here that the prediction/unknown data set lies within the bounds of the training data set, ok to proceed
+
 Unk_table_mod <- Unk_table_mod.n %>% 
   dplyr::select(-Name) %>% 
   dplyr::mutate(Prop = -999) # creating a dummy variable to make the model matrix
