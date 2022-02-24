@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Appendix B: R Code for Implementation of Ch3MS-RF 
 # (Chemical Characterization by Chromatography-MS Random Forest Modeling)
 
-## Reading In Necessary Libraries
+
 
 
 ```{r libs, echo=FALSE, message = FALSE, warning=FALSE}
@@ -602,7 +602,7 @@ Unk_table_tidy <- Unk_table_mod.n %>%
   dplyr::select(Name, Prop.p)
 
 #exporting the output table for ease of use
-write.csv(Unk_table_tidy, "Example_Output_Table.csv")
+#write.csv(Unk_table_tidy, "Example_Output_Table.csv")
 
 
 
