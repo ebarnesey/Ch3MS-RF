@@ -1,8 +1,10 @@
 ---
-title: "Appendix A: COCo CRaFt"
+title: 'Appendix B: CH3MS-RF'
 author: "Emily Barnes Franklin"
 date: "1/29/2022"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,14 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Appendix A: R Code for Implementation of COCo CRaFt 
-# (Characterization of Organic Compounds through 
-# Chromatography-MS and Random Forest Modeling)
+# Appendix B: R Code for Implementation of Ch3MS-RF 
+# (Chemical Characterization by Chromatography-MS Random Forest Modeling)
 
-##Reading In Necessary Libraries
+## Reading In Necessary Libraries
 
 
-```{r libs, echo=FALSE, message = FALSE}
+```{r libs, echo=FALSE, message = FALSE, warning=FALSE}
 library(Rcpp)
 library(caret) # cross validation
 
@@ -58,7 +59,9 @@ library(data.table)
 
 ## Custom Functions
 
-```{r CustomF}
+Here we define custom functions that will be useful later in the analysis. 
+
+```{r CustomF, warning=FALSE}
 # left join, but filling all empty cells with "False" instead of NA
 left_joinF <- function(x, y, fill = FALSE){
   z <- left_join(x, y)
@@ -96,7 +99,7 @@ In this section, the necessary data files for analysis are read in. The first of
 
 
 
-```{r Data}
+```{r Data, warning=FALSE, message = FALSE}
 # First required file: .csv file containing mass spectra, see template file
 # for formatting
 MS_table_o <- read_csv("EBF_GoldsteinGroup_ExternalStandard_GoA2018_ms.csv")
@@ -116,7 +119,7 @@ Unk_table_o <- read_csv("EBF_GoldsteinGroup_Template_Unknown_Dataset.csv")
  The principle peaks and the mass differences between key peaks are the key indicators of functional groups that exert the greatest influence on the calibration factor of the compound in question.  In this section, the top 10 peaks (by intensity) are identified for each compound.  Then, the top 40 peaks (the 40 peaks which appear in the most compounds from the external standard list) are turned into factors, for which each compound is represented by 0 if the peak is not in the top 10 for that compound or an intensity value between 0 and 1000 if that peak is one of the top 10 peaks for that compound. 
 
 
-```{r MS_peak_parse}
+```{r MS_peak_parse, warning=FALSE}
 p.n <- 10 #Number of major peaks to consider from each mass spectrum when making list of most common peaks
 p.l.l <- 40 # number of common peaks to turn into features
 
@@ -189,9 +192,9 @@ wide_mz_i <- ES_names %>%
 
 ```
 
-Next, the losses are determined.  The mass differences between the top 5 peaks for each compound are evaluated and turned into their own list. The 20 losses/neutral mass differences which appear most frequently become true/false factors for inclusion in future analysis
+Next, the losses are determined.  The mass differences between the top 5 peaks for each compound are evaluated and turned into their own list. The 20 losses/neutral mass differences which appear most frequently become true/false factors for inclusion in future analysis.
 
-```{r Ms_loss_parse}
+```{r Ms_loss_parse, warning=FALSE}
 l.n <- 5 # number of major peaks to consider when identifying losses between major peaks
 l.l.l <- 20 # number of common neutral mass differences to convert into features
 
@@ -282,9 +285,9 @@ wide_losses = ES_common_losses %>%
 wide_losses[is.na(wide_losses)] <- FALSE
 ```
 
-This process is repeated for the dataset of unknown compounds, as the data sets must be identically formatted for the property prediction to proceed smoothly
+This process is repeated for the data set of unknown compounds, as the data sets must be identically formatted for the property prediction to proceed smoothly. The peaks and mass differences from the known data set are again the features, as generating new features for the unknown compounds would create a lack similarity between the training data and the predictive data. 
 
-```{r MS_parse_unk}
+```{r MS_parse_unk, warning=FALSE}
 
 unk_table_t = Unk_table_o %>% 
     dplyr::mutate(MS = strsplit(as.character(MS), ";")) %>% 
@@ -441,9 +444,9 @@ wide_losses.a[is.na(wide_losses.a)] <- FALSE
 ```
 
 ## Prarsing Chemical Formulae
-Now that the mass spectra have been parsed, we parse the chemical formulae of the external standard compounds to generate potential properties of interest for modeling
+Now that the mass spectra have been parsed, we parse the chemical formulae of the external standard compounds to generate potential properties of interest for modeling.
 
-```{r, message=FALSE}
+```{r Form_Parse, message=FALSE, warning=FALSE}
 
 Element <- c("C", "H", "O", "N", "S")
 d.e <- data.frame(Element = Element)
@@ -495,7 +498,7 @@ Predictive_Features <- pf[pf!="Retention_Index"]
 
 ## Preparing training and test sets
 Here we identify the property of interest, prepare a data tables with only the relevant predictive information and the property of interest, and split into test and training sets. In this example case, we select carbon number as the property of interest to predict using the model.
-```{r}
+```{r Train_Test, warning=FALSE}
 ES_info_all <- ES_info_all.prop %>% 
   mutate(Prop = Cnum) %>% #Cnum can be substituted for any other property of interest, including vapor pressure, O:C, OSc, etc. 
   left_join(wide_mz_i) %>% 
@@ -526,8 +529,8 @@ ES.test <- ES_info_all.test %>%
   dplyr::select(-Predictive_Features)
 ```
 ## Random Forest Modeling of Selected Property
-Next, we use 5-fold cross validation to identify the optimal number of features for reature restriction in creating diverse trees, identify the optimal model, predict the properties for the test set, and evaluate prediction performance
-```{r}
+Next, we use 5-fold cross validation to identify the optimal number of features for feature restriction in creating diverse trees, identify the optimal model, predict the properties for the test set, and evaluate prediction performance.
+```{r Modeling}
 # training random forest model on the training ES subset
 rf.mtry.max = 40 # setting the maximum number of features for mtry feature restriction
 
@@ -575,14 +578,14 @@ p.c
 ## Predicting Properties of Unknown Compounds
 Next, we evaluate and prepare a dataframe for property prediction on the unknown compound dataset
 
-```{r}
+```{r Predicting}
 Unk_table_mod.n <- Unk_table_o %>% 
   dplyr::select(Name, Retention_Index) %>% 
   left_join(wide_mz_i.a) %>% 
   left_join(wide_losses.a) 
 
 boxplot(ES_info_all.train$Retention_Index, Unk_table_mod.n$Retention_Index, names = c("Training Set", "Prediction Set"))
-# clear here that the prediction/unknown data set lies within the bounds of the training data set, ok to proceed
+# clear here that the prediction/unknown data set lies within the bounds of the training data set, ok to proceed. If significant outliers exist, the training set should be altered to include more representative compounds or the outliers should be removed from prediction and not utilized to make conclusions about the data set. 
 
 Unk_table_mod <- Unk_table_mod.n %>% 
   dplyr::select(-Name) %>% 
@@ -598,9 +601,12 @@ Unk_table_mod.n$Prop.p <- pred.best.unk
 Unk_table_tidy <- Unk_table_mod.n %>% 
   dplyr::select(Name, Prop.p)
 
+#exporting the output table for ease of use
+write.csv(Unk_table_tidy, "Example_Output_Table.csv")
+
 
 
 ```
 
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
