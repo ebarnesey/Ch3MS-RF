@@ -1,7 +1,7 @@
 # CH3MS-RF
 README
 
-CH3MS (Chemical Characterization by Chromatography-MS Random Forest Modeling)is an R-based tool for characterizing properties of organic compounds which have been characterized by chromatography-mass spectrometry techniques but which cannot be identified by matching to publicly available mass spectrometry databases.  It requires the input of a dataset of known compounds which span the expected property (volatility, polarity, etc) distribution of the unknown compounds, and ideally should come from the instrument utilized for characterization of the novel mixture to maximize the consistency in chromatographic retention indexes.  This work is described in full in <insert link to manuscript when published>. 
+CH3MS (Chemical Characterization by Chromatography-MS Random Forest Modeling)is an R-based tool for characterizing properties of organic compounds which have been characterized by chromatography-mass spectrometry techniques but which cannot be identified by matching to publicly available mass spectrometry databases.  It requires the input of a dataset of known compounds which span the expected property (volatility, polarity, etc) distribution of the unknown compounds, and ideally should come from the instrument utilized for characterization of the novel mixture to maximize the consistency in chromatographic retention indexes.  This work is described in full in Franklin et al, "Ch3MS-RF: A Random Forest Model for Chemical Characterization and Improved Quantification of Novel Atmospheric Organics Detected by Chromatography Mass Spectrometry Techniques", which will be linked when a preprint is available. 
 
 CONTENTS
 
