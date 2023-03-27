@@ -1,5 +1,5 @@
 ---
-title: 'Appendix B: CH3MS-RF'
+title: 'Supplemental Information: CH3MS-RF'
 author: "Emily Barnes Franklin"
 date: "1/29/2022"
 output:
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Appendix B: R Code for Implementation of Ch3MS-RF 
+# Supplemental Information: R Code for Implementation of Ch3MS-RF 
 # (Chemical Characterization by Chromatography-MS Random Forest Modeling)
 
 
@@ -441,7 +441,7 @@ wide_losses.a[is.na(wide_losses.a)] <- FALSE
   
 ```
 
-## Prarsing Chemical Formulae
+## Parsing Chemical Formulae
 Now that the mass spectra have been parsed, we parse the chemical formulae of the external standard compounds to generate potential properties of interest for modeling.
 
 ```{r Form_Parse, message=FALSE, warning=FALSE}
